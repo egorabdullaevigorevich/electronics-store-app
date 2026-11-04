@@ -1,0 +1,3 @@
+[submodule "ElectronicsStore-Client"]
+	path = ElectronicsStore-Client
+	url = https://github.com/egorabdullaevigorevich/electronics-store-app/ElectronicsStore-Client

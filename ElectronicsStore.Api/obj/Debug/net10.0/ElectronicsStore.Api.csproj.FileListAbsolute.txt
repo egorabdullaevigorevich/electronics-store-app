@@ -161,3 +161,5 @@ D:\ElectronicStore\ElectronicsStore.Api\bin\Debug\net10.0\Scalar.AspNetCore.dll
 D:\ElectronicStore\ElectronicsStore.Api\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\ElectronicStore\ElectronicsStore.Api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\ElectronicStore\ElectronicsStore.Api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\ElectronicStore\ElectronicsStore.Api\bin\Debug\net10.0\ElectronicsStore.Api.staticwebassets.runtime.json
+D:\ElectronicStore\ElectronicsStore.Api\obj\Debug\net10.0\ElectronicsStore.Api.sourcelink.json

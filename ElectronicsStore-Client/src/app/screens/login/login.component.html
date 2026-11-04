@@ -1,0 +1,25 @@
+<div class="auth-container">
+  <h2>{{ isRegisterMode ? 'Регистрация аккаунта' : 'Вход в магазин' }}</h2>
+  
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Имя пользователя:</label>
+      <input type="text" name="username" [(ngModel)]="credentials.username" required />
+    </div>
+    <div class="form-group">
+      <label>Пароль:</label>
+      <input type="password" name="password" [(ngModel)]="credentials.password" required />
+    </div>
+
+    @if (errorMessage()) {
+      <div class="auth-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="auth-actions">
+      <button type="submit">{{ isRegisterMode ? 'Зарегистрироваться' : 'Войти' }}</button>
+      <a href="javascript:void(0)" (click)="isRegisterMode = !isRegisterMode">
+        {{ isRegisterMode ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Создать' }}
+      </a>
+    </div>
+  </form>
+</div>

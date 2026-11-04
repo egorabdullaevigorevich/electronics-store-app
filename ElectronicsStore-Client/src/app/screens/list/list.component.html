@@ -1,0 +1,70 @@
+<div class="catalog-container">
+  <div class="main-layout">
+    <!-- Левая колонка: Панель фильтров и сортировки -->
+    <app-filter></app-filter>
+    
+    <!-- Правая колонка: Сетка товаров, состояния экрана и пагинация -->
+    <div>
+      
+      <!-- Состояние 1: Загрузка данных -->
+      @if (productService.isLoading()) {
+        <div style="text-align: center; padding: 50px; font-size: 16px; color: #666; font-family: sans-serif;">
+          🔄 Загрузка каталога товаров...
+        </div>
+      }
+
+      <!-- Состояние 2: Ошибка сервера -->
+      @else if (productService.error()) {
+        <div style="text-align: center; padding: 50px; color: #dc3545; font-weight: 600; font-family: sans-serif; background: #fff0f0; border-radius: 8px; border: 1px solid #ffe3e3;">
+          ❌ Произошла ошибка при получении данных с сервера.<br>
+          <span style="font-size: 13px; font-weight: 400; color: #666; margin-top: 8px; display: block;">
+            Убедитесь, что .NET бэкенд запущен и работает на порту 5250.
+          </span>
+        </div>
+      }
+
+      <!-- Состояние 3: Пустой список данных -->
+      @else if (!productService.products() || (productService.products()?.items?.length ?? 0) === 0) {
+        <div style="text-align: center; padding: 50px; font-size: 16px; color: #888; font-family: sans-serif; background: #f8f9fa; border-radius: 8px;">
+          📦 В данной категории товаров не найдено. Попробуйте сбросить фильтры.
+        </div>
+      }
+
+      <!-- Состояние 4: Отображение данных (Выполнение требования №6) -->
+      @else {
+        <div class="products-grid">
+          @for (prod of productService.products()?.items; track prod.id) {
+            <app-card 
+              [product]="prod"
+              (edit)="onEditProduct($event)"
+              (delete)="onDeleteProduct($event)"
+              (upload)="onUploadPhoto($event)">
+            </app-card>
+          }
+        </div>
+
+        <!-- Управление страницами (Пагинация по требованию №5) -->
+        <div class="pagination-panel">
+          <button 
+            class="pagination-btn" 
+            [disabled]="productService.currentPage() === 1"
+            (click)="productService.currentPage.set(productService.currentPage() - 1)">
+            ◀ Назад
+          </button>
+          
+          <span class="page-info">
+            Страница {{ productService.currentPage() }}
+          </span>
+          
+          <button 
+            class="pagination-btn" 
+            [disabled]="(productService.currentPage() * productService.pageSize()) >= (productService.products()?.total ?? 0)"
+            (click)="productService.currentPage.set(productService.currentPage() + 1)">
+            Вперёд ▶
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

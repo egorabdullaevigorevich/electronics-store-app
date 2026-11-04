@@ -1,0 +1,42 @@
+<div class="filter-box">
+  <h3>Фильтры и Сортировка</h3>
+
+  <!-- 1. Категория -->
+  <div class="filter-group">
+    <label>Категория:</label>
+    <select class="form-select" [(ngModel)]="categoryValue">
+      <option value="">Все категории</option>
+      @for (cat of categories; track cat.id) {
+        <option [value]="cat.id">{{ cat.name }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- 2. Только в наличии -->
+  <div class="filter-group">
+    <label class="checkbox-label">
+      <input type="checkbox" [(ngModel)]="inStockValue">
+      Только в наличии
+    </label>
+  </div>
+
+  <!-- 3. Цена от-до -->
+  <div class="filter-group">
+    <label>Цена (от–до):</label>
+    <div class="price-inputs">
+      <input type="number" class="form-input" placeholder="От" [(ngModel)]="minPriceValue">
+      <input type="number" class="form-input" placeholder="До" [(ngModel)]="maxPriceValue">
+    </div>
+  </div>
+
+  <!-- 4. Сортировка -->
+  <div class="filter-group">
+    <label>Сортировка:</label>
+    <select class="form-select" [(ngModel)]="sortValue">
+      <option value="id">По умолчанию</option>
+      <option value="price_asc">Сначала дешевые</option>
+      <option value="price_desc">Сначала дорогие</option>
+      <option value="newest">Сначала новые</option>
+    </select>
+  </div>
+</div>

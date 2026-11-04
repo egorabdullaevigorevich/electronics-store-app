@@ -1,0 +1,25 @@
+<div class="product-card">
+  <div class="image-container">
+    <img [src]="getImageUrl()" [alt]="product().name" class="product-image">
+  </div>
+
+  <span class="category-badge">{{ product().category.name }}</span>
+  <h3 class="product-name">{{ product().name }}</h3>
+  <p class="product-description">{{ product().description }}</p>
+
+  <div class="meta-info">
+    <div class="price">{{ product().price | number:'1.0-0' }} ₽</div>
+    <div class="stock-status" [ngClass]="product().stock > 0 ? 'in-stock' : 'out-of-stock'">
+      {{ product().stock > 0 ? '✓ В наличии (' + product().stock + ' шт.)' : '✗ Нет в наличии' }}
+    </div>
+    <div class="warranty">Гарантия: {{ product().warrantyMonths }} мес.</div>
+  </div>
+
+  @if (isAuthor()) {
+    <div class="author-actions">
+      <button class="btn btn-edit" (click)="edit.emit(product().id)">Редактировать</button>
+      <button class="btn btn-delete" (click)="delete.emit(product().id)">Удалить</button>
+      <button class="btn btn-upload" (click)="upload.emit(product().id)">📸 Загрузить фото</button>
+    </div>
+  }
+</div>

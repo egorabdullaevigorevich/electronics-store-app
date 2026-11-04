@@ -1,7 +1,7 @@
 # .gitignore
-Backend/ElectronicsStore.Api/bin/
-Backend/ElectronicsStore.Api/obj/
-Frontend/ElectronicsStore-Client/node_modules/
-Frontend/ElectronicsStore-Client/.angular/
+ElectronicsStore.Api/bin/
+ElectronicsStore.Api/obj/
+ElectronicsStore-Client/node_modules/
+ElectronicsStore-Client/.angular/
 *.db
 *.sqlite

@@ -1,0 +1,74 @@
+@hostname = localhost
+@port = 5250
+@host = http://{{hostname}}:{{port}}
+@token = ВСТАВЬТЕ_ТОКЕН_ИЗ_ОТВЕТА_ПОСЛЕ_ВХОДА
+
+### 1. Регистрация нового аккаунта (Тест FluentValidation / Проверка дубликатов)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "seller_ivan",
+  "password": "Password123"
+}
+
+### 2. Вход в систему (Получение JWT токена автора)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Test1234"
+}
+
+### 3. Получение списка товаров (Публичный доступ: пагинация, фильтр и сортировка)
+GET {{host}}/api/products?categoryId=1&inStock=true&minPrice=50000&sortBy=price_asc&page=1&pageSize=5
+
+### 4. Получение конкретного товара по ID (Код ответа 200 или 404)
+GET {{host}}/api/products/1
+
+### 5. Создание нового товара (Требует авторизации, иначе 401)
+POST {{host}}/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Игровые наушники HyperX Cloud",
+  "price": 12000,
+  "stock": 15,
+  "warrantyMonths": 12,
+  "description": "Отличный звук для геймеров",
+  "categoryId": 3
+}
+
+### 6. Изменение товара АВТОРОМ (Валидное изменение цены)
+PUT {{host}}/api/products/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "iPhone 15 Pro Max Ultra",
+  "price": 135000, 
+  "stock": 8,
+  "warrantyMonths": 12,
+  "description": "Обновленное описание флагмана",
+  "categoryId": 1
+}
+
+### 7. Невалидное изменение товара (Отказ 400 по кастомному бизнес-правилу — цена > в 2 раза)
+PUT {{host}}/api/products/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "iPhone 15 Pro Max Ultra",
+  "price": 350000, 
+  "stock": 8,
+  "warrantyMonths": 12,
+  "description": "Попытка резко завысить цену",
+  "categoryId": 1
+}
+
+### 8. Удаление товара (Разрешено только автору, иначе 403)
+DELETE {{host}}/api/products/5
+Authorization: Bearer {{token}}

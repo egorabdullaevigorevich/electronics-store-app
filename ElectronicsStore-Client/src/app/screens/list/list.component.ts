@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CardComponent } from '../../components/card/card.component';
 import { FilterComponent } from '../../components/filter/filter.component';
 import { ProductService } from '../../services/product.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-list',
@@ -15,6 +16,7 @@ import { ProductService } from '../../services/product.service';
 export class ListComponent {
   // Внедряем сервис как public, чтобы шаблон имел к нему прямой доступ
   public productService = inject(ProductService);
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   // Переход на защищенную форму редактирования товара (Выполнение ТЗ)

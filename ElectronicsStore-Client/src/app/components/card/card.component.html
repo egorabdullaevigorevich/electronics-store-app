@@ -15,7 +15,7 @@
     <div class="warranty">Гарантия: {{ product().warrantyMonths }} мес.</div>
   </div>
 
-  @if (isAuthor()) {
+  @if (isAdmin()) {
     <div class="author-actions">
       <button class="btn btn-edit" (click)="edit.emit(product().id)">Редактировать</button>
       <button class="btn btn-delete" (click)="delete.emit(product().id)">Удалить</button>

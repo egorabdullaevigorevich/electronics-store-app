@@ -10,7 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Globalization;
 
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 var builder = WebApplication.CreateBuilder(args);
 
 // =================================================================================
@@ -35,6 +38,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            RoleClaimType = ClaimTypes.Role,
             ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "StoreApi",
             ValidAudience = builder.Configuration["Jwt:Audience"] ?? "StoreClient",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
@@ -169,7 +173,7 @@ api.MapPost("/", async (
     await db.SaveChangesAsync();
 
     return Results.Created($"/api/products/{product.Id}", product);
-}).RequireAuthorization();
+}).RequireAuthorization(policy => policy.RequireRole("Admin"));
 
 // =================================================================================
 // ЭНДПОИНТ 4: PUT РЕДАКТИРОВАНИЕ (Только автор записи + контроль изменения цены)
@@ -186,8 +190,6 @@ api.MapPut("/{id:int}", async (
 
     var product = await db.Products.FindAsync(id);
     if (product == null) return Results.NotFound();
-
-    if (product.UserId != currentUserId.Value) return Results.Forbid();
 
     var validationResult = await validator.ValidateAsync(dto);
     if (!validationResult.IsValid) return Results.ValidationProblem(validationResult.ToDictionary());
@@ -211,7 +213,7 @@ api.MapPut("/{id:int}", async (
 
     await db.SaveChangesAsync();
     return Results.NoContent();
-}).RequireAuthorization();
+}).RequireAuthorization(policy => policy.RequireRole("Admin"));
 
 // =================================================================================
 // ЭНДПОИНТ 5: DELETE УДАЛЕНИЕ (Только автор записи, код 204)
@@ -224,12 +226,10 @@ api.MapDelete("/{id:int}", async (int id, AppDbContext db, ClaimsPrincipal user)
     var product = await db.Products.FindAsync(id);
     if (product == null) return Results.NotFound();
 
-    if (product.UserId != currentUserId.Value) return Results.Forbid();
-
     db.Products.Remove(product);
     await db.SaveChangesAsync();
     return Results.NoContent();
-}).RequireAuthorization();
+}).RequireAuthorization(policy => policy.RequireRole("Admin"));
 
 // =================================================================================
 // ДОПОЛНИТЕЛЬНО: ЗАГРУЗКА ИЗОБРАЖЕНИЯ (Только автор, лимит до 5 МБ, имя - Guid)
@@ -241,8 +241,6 @@ app.MapPost("/api/products/{id:int}/upload", async (int id, HttpContext httpCont
 
     var product = await db.Products.FindAsync(id);
     if (product == null) return Results.NotFound();
-    if (product.UserId != currentUserId.Value) return Results.Forbid();
-
     var form = await httpContext.Request.ReadFormAsync();
     var file = form.Files.GetFile("file");
     if (file == null || file.Length == 0) return Results.BadRequest("Файл не передан.");
@@ -263,13 +261,16 @@ app.MapPost("/api/products/{id:int}/upload", async (int id, HttpContext httpCont
     product.ImageFileName = uniqueFileName;
     await db.SaveChangesAsync();
     return Results.Ok(new { ImageUrl = $"/uploads/{uniqueFileName}" });
-}).RequireAuthorization();
+}).RequireAuthorization(policy => policy.RequireRole("Admin"));
 
 // =================================================================================
 // УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (РЕГИСТРАЦИЯ И ВХОД)
 // =================================================================================
 app.MapPost("/api/auth/register", async (RegisterDto dto, AppDbContext db) =>
 {
+    if (string.Equals(dto.Username, "admin", StringComparison.OrdinalIgnoreCase))
+        return Results.BadRequest(new { message = "Имя admin зарезервировано." });
+
     if (await db.Users.AnyAsync(u => u.Username == dto.Username))
         return Results.BadRequest(new { message = "Данное имя пользователя уже занято." });
         

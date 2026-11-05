@@ -16,6 +16,7 @@ export class AuthService {
 
   // Сигнал для имени пользователя (пригодится для отображения в UI автора)
   public currentUsername = signal<string | null>(null);
+  public isAdmin = computed(() => this.currentUsername() === 'admin');
 
   // Публичный вычисляемый сигнал (computed) для проверки, вошел ли пользователь
   public isAuthenticated = computed(() => !!this.tokenSignal());

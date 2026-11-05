@@ -16,11 +16,14 @@ public class AuthService(IConfiguration configuration)
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         // Помещаем ID и имя пользователя внутрь зашифрованного паспорта (Claims)
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username)
         };
+
+        if (user.Username == "admin")
+            claims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
         var token = new JwtSecurityToken(
             issuer: configuration["Jwt:Issuer"],

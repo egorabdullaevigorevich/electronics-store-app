@@ -1,4 +1,10 @@
 :host {
+	--ink: #183b35;
+	--muted: #52635e;
+	--accent: #df6842;
+	--line: #d3ddd8;
+	position: relative;
+	isolation: isolate;
 	display: grid;
 	min-height: calc(100dvh - 64px);
 	place-items: center;
@@ -12,21 +18,41 @@
 }
 
 .auth-container {
+	position: relative;
 	width: min(100%, 440px);
-	padding: 40px;
+	padding: 42px;
 	box-sizing: border-box;
-	border: 1px solid #dce4df;
-	border-top: 4px solid #e16d45;
-	border-radius: 10px;
+	border: 1px solid var(--line);
+	border-top: 5px solid var(--accent);
+	border-radius: 8px;
 	background: #fff;
-	box-shadow: 0 24px 60px rgba(24, 45, 40, 0.12);
-	color: #1c302c;
+	box-shadow: 0 28px 72px rgba(24, 45, 40, 0.14), 0 3px 10px rgba(24, 45, 40, 0.05);
+	color: var(--ink);
 	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+	animation: auth-arrive 420ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.auth-eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	margin: 0 0 16px;
+	color: var(--muted);
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.auth-eyebrow span {
+	width: 8px;
+	height: 8px;
+	border-radius: 2px;
+	background: var(--accent);
 }
 
 .auth-container h2 {
 	margin: 0 0 30px;
-	color: #183b35;
+	color: var(--ink);
 	font-family: Georgia, "Times New Roman", serif;
 	font-size: 32px;
 	font-weight: 700;
@@ -40,7 +66,7 @@
 }
 
 .form-group label {
-	color: #435751;
+	color: var(--muted);
 	font-size: 14px;
 	font-weight: 700;
 }
@@ -50,7 +76,7 @@
 	height: 48px;
 	padding: 0 13px;
 	box-sizing: border-box;
-	border: 1px solid #c8d3ce;
+	border: 1px solid #c5d1cb;
 	border-radius: 5px;
 	outline: none;
 	background: #fbfcfb;
@@ -91,21 +117,28 @@
 
 .auth-actions button {
 	min-height: 46px;
-	padding: 0 22px;
+	padding: 0 24px;
 	border: 0;
 	border-radius: 5px;
-	background: #183b35;
+	background: var(--accent);
 	color: #fff;
 	font: inherit;
 	font-size: 15px;
 	font-weight: 700;
 	cursor: pointer;
-	transition: background 160ms ease, transform 160ms ease;
+	box-shadow: 0 3px 0 #b94d2d;
+	transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .auth-actions button:hover {
-	transform: translateY(-1px);
-	background: #24574d;
+	transform: translateY(-2px);
+	background: #c95734;
+	box-shadow: 0 5px 0 #a94428;
+}
+
+.auth-actions button:active {
+	transform: translateY(1px);
+	box-shadow: 0 1px 0 #a94428;
 }
 
 .auth-actions button:focus-visible,
@@ -132,7 +165,7 @@
 	}
 
 	.auth-container {
-		padding: 30px 24px;
+		padding: 32px 24px;
 	}
 
 	.auth-container h2 {
@@ -152,5 +185,26 @@
 
 	.auth-actions a {
 		text-align: center;
+	}
+}
+
+@keyframes auth-arrive {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.auth-container {
+		animation: none;
+	}
+
+	.auth-actions button {
+		transition: none;
 	}
 }

@@ -1,6 +1,9 @@
 <div class="form-container">
   <h2>{{ isEditMode ? 'Редактирование товара' : 'Добавление нового товара' }}</h2>
   
+  @if (isLoading()) {
+    <p class="form-loading" role="status">Загрузка товара...</p>
+  } @else {
   <form (ngSubmit)="onSubmit()" #productForm="ngForm">
     <!-- Поле: Название -->
     <div class="form-group">
@@ -43,9 +46,9 @@
     <div class="form-group">
       <label for="category">Категория:</label>
       <select id="category" name="categoryId" [(ngModel)]="model.categoryId">
-        <option [value]="1">Смартфоны</option>
-        <option [value]="2">Ноутбуки</option>
-        <option [value]="3">Аксессуары</option>
+        <option [ngValue]="1">Смартфоны</option>
+        <option [ngValue]="2">Ноутбуки</option>
+        <option [ngValue]="3">Аксессуары</option>
       </select>
       <!-- Добавлен вывод серверной ошибки для категории -->
       @if (serverErrors()['CategoryId']) {
@@ -68,4 +71,5 @@
       <button type="button" class="btn-cancel" (click)="onCancel()">Отмена</button>
     </div>
   </form>
+  }
 </div>

@@ -1,0 +1,132 @@
+.site-header {
+	display: flex;
+	min-height: 64px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 0 30px;
+	box-sizing: border-box;
+	border-bottom: 3px solid #df6842;
+	background: #1a1a1a;
+	box-shadow: 0 3px 14px rgba(0, 0, 0, 0.14);
+	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.brand {
+	display: inline-flex;
+	min-width: 0;
+	align-items: center;
+	gap: 10px;
+	color: #fff;
+	font-size: 19px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.brand-mark {
+	color: #f08a55;
+	font-size: 22px;
+}
+
+.site-nav {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+.user-name {
+	display: inline-flex;
+	max-width: min(32vw, 220px);
+	align-items: center;
+	gap: 8px;
+	overflow: hidden;
+	color: #e7ece9;
+	font-size: 14px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.user-name span {
+	color: #f08a55;
+	font-size: 11px;
+}
+
+.nav-button {
+	min-height: 38px;
+	padding: 0 16px;
+	border: 1px solid transparent;
+	border-radius: 5px;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.nav-button:hover {
+	transform: translateY(-1px);
+}
+
+.nav-button:focus-visible,
+.brand:focus-visible {
+	outline: 3px solid #f08a55;
+	outline-offset: 3px;
+}
+
+.nav-button--primary {
+	background: #df6842;
+	color: #fff;
+}
+
+.nav-button--primary:hover {
+	background: #c95734;
+}
+
+.nav-button--quiet {
+	border-color: #59615e;
+	background: transparent;
+	color: #fff;
+}
+
+.nav-button--quiet:hover {
+	border-color: #df6842;
+	background: rgba(223, 104, 66, 0.12);
+}
+
+@media (max-width: 480px) {
+	.site-header {
+		min-height: 58px;
+		padding: 0 14px;
+	}
+
+	.brand {
+		gap: 7px;
+		font-size: 16px;
+	}
+
+	.brand-mark {
+		font-size: 19px;
+	}
+
+	.site-nav {
+		gap: 8px;
+	}
+
+	.user-name {
+		max-width: 84px;
+		font-size: 12px;
+	}
+
+	.nav-button {
+		min-height: 36px;
+		padding: 0 11px;
+		font-size: 13px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.nav-button {
+		transition: none;
+	}
+}

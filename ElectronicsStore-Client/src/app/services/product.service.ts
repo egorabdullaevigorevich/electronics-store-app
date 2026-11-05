@@ -70,6 +70,10 @@ export class ProductService {
   public isLoading = computed(() => this.productsResource.isLoading());
   public error = computed(() => this.productsResource.error());
 
+  public refresh(): void {
+    this.productsResource.reload();
+  }
+
   // Остальные стандартные методы для CRUD операций
   public getById(id: number): Observable<ProductListDto> {
     return this.http.get<ProductListDto>(`${this.apiUrl}/${id}`);

@@ -29,9 +29,11 @@ export class ListComponent {
     if (confirm('Вы действительно хотите удалить этот товар из каталога?')) {
       this.productService.delete(id).subscribe({
         next: () => {
-          alert('Товар успешно удален.');
-          // Триггерим обновление httpResource, сбрасывая страницу на первую
-          this.productService.currentPage.set(1);
+          if (this.productService.currentPage() === 1) {
+            this.productService.refresh();
+          } else {
+            this.productService.currentPage.set(1);
+          }
         },
         error: (err) => {
           console.error(err);
@@ -53,10 +55,8 @@ export class ListComponent {
         const file = files[0];
         
         this.productService.uploadImage(id, file).subscribe({
-          next: (response) => {
-            alert('Фотография товара успешно загружена!');
-            // Перезагружаем текущую страницу для обновления кэша httpResource и отображения Guid-картинки
-            this.productService.currentPage.set(this.productService.currentPage());
+          next: () => {
+            this.productService.refresh();
           },
           error: (err) => {
             console.error(err);

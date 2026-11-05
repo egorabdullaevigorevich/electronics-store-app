@@ -19,6 +19,7 @@ export class FormComponent implements OnInit {
 
   // Состояние формы (Редактирование или Создание нового по ТЗ)
   public isEditMode = false;
+  public isLoading = signal(false);
   private productId: number | null = null;
 
   // Модель данных формы для [(ngModel)] связи
@@ -40,6 +41,7 @@ export class FormComponent implements OnInit {
     if (idParam) {
       this.isEditMode = true;
       this.productId = Number(idParam);
+      this.isLoading.set(true);
       
       // Загружаем данные товара для предзаполнения формы редактирования
       this.productService.getById(this.productId).subscribe({
@@ -52,9 +54,11 @@ export class FormComponent implements OnInit {
             description: product.description,
             categoryId: product.category.id
           };
+          this.isLoading.set(false);
         },
         error: (err) => {
           console.error(err);
+          this.isLoading.set(false);
           alert('Товар не найден или у вас нет прав на его редактирование.');
           this.router.navigate(['/404']);
         }
@@ -73,7 +77,7 @@ export class FormComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
-        alert(this.isEditMode ? 'Товар успешно обновлен!' : 'Товар успешно создан!');
+        this.productService.refresh();
         this.router.navigate(['/']); // Возвращаемся в каталог к адаптивной сетке
       },
       error: (err) => {

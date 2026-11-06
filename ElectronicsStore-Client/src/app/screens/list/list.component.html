@@ -5,7 +5,7 @@
     
     <!-- Правая колонка: Сетка товаров, состояния экрана и пагинация -->
     <div>
-      @if (authService.isAdmin()) {
+      @if (authService.isAuthenticated()) {
         <button class="pagination-btn" routerLink="/products/create">Добавить товар</button>
       }
       

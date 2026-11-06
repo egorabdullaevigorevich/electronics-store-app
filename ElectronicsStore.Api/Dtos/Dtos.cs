@@ -46,4 +46,4 @@ public record RegisterDto(string Username, string Password);
 public record LoginDto(string Username, string Password);
 
 // Ответ сервера при успешном входе, содержащий JWT-токен
-public record AuthResponseDto(string Token, string Username);
+public record AuthResponseDto(string Token, string Username, int UserId);

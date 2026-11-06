@@ -80,7 +80,7 @@ app.UseAuthorization();
 int? GetCurrentUserId(ClaimsPrincipal principal)
 {
     var claim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    return claim != null ? int.Parse(claim) : null;
+    return int.TryParse(claim, out var userId) ? userId : null;
 }
 
 // Создаем базовую группу адресов по ТЗ
@@ -127,12 +127,16 @@ api.MapGet("/", async (
 });
 
 // =================================================================================
-// ЭНДПОИНТ 2: GET ПО ID (Доступен всем. Просмотр карточки товара)
+// ЭНДПОИНТ 2: GET ПО ID (Доступен владельцу товара)
 // =================================================================================
-api.MapGet("/{id:int}", async (int id, AppDbContext db) =>
+api.MapGet("/{id:int}", async (int id, AppDbContext db, ClaimsPrincipal user) =>
 {
+    var currentUserId = GetCurrentUserId(user);
+    if (currentUserId == null) return Results.Unauthorized();
+
     var p = await db.Products.Include(p => p.Category).FirstOrDefaultAsync(x => x.Id == id);
     if (p == null) return Results.NotFound();
+    if (p.UserId != currentUserId.Value) return Results.Forbid();
 
     var dto = new ProductListDto(
         p.Id, p.Name, p.Price, p.Stock, p.WarrantyMonths, p.Description,
@@ -140,7 +144,7 @@ api.MapGet("/{id:int}", async (int id, AppDbContext db) =>
         new CategoryDto(p.Category!.Id, p.Category.Name), p.UserId
     );
     return Results.Ok(dto);
-});
+}).RequireAuthorization();
 
 // =================================================================================
 // ЭНДПОИНТ 3: POST СОЗДАНИЕ (Только для авторизованных, код 201)
@@ -173,7 +177,7 @@ api.MapPost("/", async (
     await db.SaveChangesAsync();
 
     return Results.Created($"/api/products/{product.Id}", product);
-}).RequireAuthorization(policy => policy.RequireRole("Admin"));
+}).RequireAuthorization();
 
 // =================================================================================
 // ЭНДПОИНТ 4: PUT РЕДАКТИРОВАНИЕ (Только автор записи + контроль изменения цены)
@@ -190,6 +194,7 @@ api.MapPut("/{id:int}", async (
 
     var product = await db.Products.FindAsync(id);
     if (product == null) return Results.NotFound();
+    if (product.UserId != currentUserId.Value) return Results.Forbid();
 
     var validationResult = await validator.ValidateAsync(dto);
     if (!validationResult.IsValid) return Results.ValidationProblem(validationResult.ToDictionary());
@@ -213,7 +218,7 @@ api.MapPut("/{id:int}", async (
 
     await db.SaveChangesAsync();
     return Results.NoContent();
-}).RequireAuthorization(policy => policy.RequireRole("Admin"));
+}).RequireAuthorization();
 
 // =================================================================================
 // ЭНДПОИНТ 5: DELETE УДАЛЕНИЕ (Только автор записи, код 204)
@@ -225,11 +230,12 @@ api.MapDelete("/{id:int}", async (int id, AppDbContext db, ClaimsPrincipal user)
 
     var product = await db.Products.FindAsync(id);
     if (product == null) return Results.NotFound();
+    if (product.UserId != currentUserId.Value) return Results.Forbid();
 
     db.Products.Remove(product);
     await db.SaveChangesAsync();
     return Results.NoContent();
-}).RequireAuthorization(policy => policy.RequireRole("Admin"));
+}).RequireAuthorization();
 
 // =================================================================================
 // ДОПОЛНИТЕЛЬНО: ЗАГРУЗКА ИЗОБРАЖЕНИЯ (Только автор, лимит до 5 МБ, имя - Guid)
@@ -241,6 +247,7 @@ app.MapPost("/api/products/{id:int}/upload", async (int id, HttpContext httpCont
 
     var product = await db.Products.FindAsync(id);
     if (product == null) return Results.NotFound();
+    if (product.UserId != currentUserId.Value) return Results.Forbid();
     var form = await httpContext.Request.ReadFormAsync();
     var file = form.Files.GetFile("file");
     if (file == null || file.Length == 0) return Results.BadRequest("Файл не передан.");
@@ -261,7 +268,7 @@ app.MapPost("/api/products/{id:int}/upload", async (int id, HttpContext httpCont
     product.ImageFileName = uniqueFileName;
     await db.SaveChangesAsync();
     return Results.Ok(new { ImageUrl = $"/uploads/{uniqueFileName}" });
-}).RequireAuthorization(policy => policy.RequireRole("Admin"));
+}).RequireAuthorization();
 
 // =================================================================================
 // УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (РЕГИСТРАЦИЯ И ВХОД)
@@ -285,7 +292,7 @@ app.MapPost("/api/auth/login", async (LoginDto dto, AppDbContext db, AuthService
     if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         return Results.BadRequest(new { message = "Неверный логин или пароль." });
         
-    return Results.Ok(new AuthResponseDto(authService.GenerateToken(user), user.Username));
+    return Results.Ok(new AuthResponseDto(authService.GenerateToken(user), user.Username, user.Id));
 });
 
 app.Run();

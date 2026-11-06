@@ -1,4 +1,4 @@
-import { Component, input, output, inject } from '@angular/core';
+import { Component, input, output, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductListDto } from '../../models/product.interface';
 import { AuthService } from '../../services/auth.service';
@@ -21,7 +21,7 @@ export class CardComponent {
   delete = output<number>();
   upload = output<number>();
 
-  isAdmin = this.authService.isAdmin;
+  canManage = computed(() => this.authService.currentUserId() === this.product().userId);
 
   // Хелпер для формирования полного URL картинки товара
   getImageUrl(): string {
